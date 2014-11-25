@@ -382,17 +382,19 @@ ms_inp = SpikeMonitor(inp)
 
 s_PYLTS      = StateMonitor(c_PYLTS,'x', record = True)
 s_LTSPY      = StateMonitor(c_LTSPY,'x', record = True)
-I_PY         = StateMonitor(PY,'ILTS', record = True, dt = dt_sim)
-I_LTS        = StateMonitor(LTS,'IPY', record = True, dt = dt_sim)
+I_LTSPY      = StateMonitor(PY,'ILTS', record = True, dt = dt_sim)
+I_PYLTS      = StateMonitor(LTS,'IPY', record = True, dt = dt_sim)
+I_FSPY       = StateMonitor(PY,'IFS', record = True, dt = dt_sim)
+I_PYFS       = StateMonitor(FS,'IPY', record = True, dt = dt_sim)
 
 #########################
 # Run the simulation
-monitors = [m_PY,m_LTS,m_FS,ms_inp,m_TC,m_RE,
-            s_PYLTS,s_LTSPY,I_PY,I_LTS]
-connects = [c_inpPY, c_PYLTS, c_LTSPY, c_PYFS, c_FSPY,
-            c_PYTC, c_TCPY, c_TCFS, c_TCLTS,
-            c_PYRE, c_TCRE, c_RETC, c_RE, c_FS, c_LTS]
-neurons = [inp, PY, LTS, FS, TC, RE]
+monitors = [m_PY,m_LTS,m_FS,ms_inp,#m_TC,m_RE,
+            s_PYLTS,s_LTSPY,I_LTSPY,I_PYLTS,I_FSPY,I_PYFS]
+connects = [c_inpPY, c_PYLTS, c_LTSPY, c_PYFS, c_FSPY]#,
+            #c_PYTC, c_TCPY, c_TCFS, c_TCLTS,
+            #c_PYRE, c_TCRE, c_RETC, c_RE, c_FS, c_LTS]
+neurons = [inp, PY, LTS, FS]#, TC, RE]
 net = Network(neurons,connects,monitors)
 net.run(100*ms)
 
@@ -401,7 +403,7 @@ net.run(100*ms)
 # Visualize results
 #%%
 plt.figure()
-subplot(2,1,1)
+subplot(3,1,1)
 plt.plot(m_PY.t/ms, m_PY.v[0]/mV, label='PY')
 plt.plot(m_LTS.t/ms, m_LTS.v[0]/mV, label='LTS')
 plt.plot(m_FS.t/ms, m_FS.v[0]/mV, label='FS')
@@ -411,10 +413,15 @@ plt.plot(ms_inp.t/ms, ms_inp.i, 'ro')
 plt.legend()
 plt.show()
 #%%
-subplot(2,1,2)
+subplot(3,1,2)
 plt.plot(s_PYLTS.t/ms,s_PYLTS.x[0],label='PYLTS')
 plt.plot(s_LTSPY.t/ms,s_LTSPY.x[0],label='LTSPY')
-plt.plot(I_PY.t/ms,I_PY.ILTS[0]*20,label='I_PY')
-plt.plot(I_LTS.t/ms,I_LTS.IPY[0]*20,label='I_LTS')
+plt.legend()
+plt.show()
+subplot(3,1,3)
+plt.plot(I_LTSPY.t/ms,I_LTSPY.ILTS[0],label='I_LTS-->PY')
+plt.plot(I_PYLTS.t/ms,I_PYLTS.IPY[0],label='I_PY-->LTS')
+plt.plot(I_FSPY.t/ms,I_FSPY.IFS[0],label='I_FS-->PY')
+plt.plot(I_PYFS.t/ms,I_PYFS.IPY[0],label='I_PY-->FS')
 plt.legend()
 plt.show()
